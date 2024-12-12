@@ -10,13 +10,16 @@ class Parallax:
             image = pygame.image.load(path)
             width, height = image.get_size()
             aspect_ratio = width / height
-            image = pygame.transform.scale(image, (screen_width, float(screen_width / aspect_ratio)))
+            image = pygame.transform.scale(image, (screen_width, int(screen_width / aspect_ratio)))
             speed_multiplier = 1 / (length - i)
-            self.bg_layers.append((image, speed_multiplier))
+            y_offset = 0  # Default Y-offset for all layers
+            if "trees" in path:  # Adjust Y-offset specifically for the trees
+                y_offset = -220  # Raise the trees higher (tune this value as needed)
+            self.bg_layers.append((image, speed_multiplier, y_offset))
 
     def draw(self, screen, scroll):
-        for layer, speed_multiplier in self.bg_layers:
+        for layer, speed_multiplier, y_offset in self.bg_layers:
             layer_width = layer.get_width()
             x_offset = -(scroll * 4 * speed_multiplier) % layer_width
-            screen.blit(layer, (x_offset, 0))
-            screen.blit(layer, (x_offset - layer_width, 0))
+            screen.blit(layer, (x_offset, y_offset))
+            screen.blit(layer, (x_offset - layer_width, y_offset))
