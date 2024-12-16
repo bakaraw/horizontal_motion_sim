@@ -41,6 +41,10 @@ def main():
 
     font = pygame.font.Font(None, 24)
 
+    target_distance = 500  # Set your target distance in meters
+    elapsed_time = 0
+    measuring_time = False
+
     # Main game loop
     while running:
         for event in pygame.event.get():
@@ -54,6 +58,10 @@ def main():
         # Change in time
         delta_time = clock.tick(FPS) / 1000
 
+        # starts the timer
+        if velocity > 0 and not measuring_time:
+            measuring_time = True
+
         # Physics calculation (velocity and position)
         velocity += accelaration * delta_time
         velocity = max(-max_velocity, min(max_velocity, velocity))
@@ -62,6 +70,13 @@ def main():
 
         bg_position_x += velocity * delta_time
         total_distance += velocity * delta_time
+
+        if total_distance >= target_distance and measuring_time:
+            measuring_time = False
+            print(f"Time to travel {target_distance} meters: {elapsed_time:.2f} seconds")
+
+        if measuring_time:
+            elapsed_time += delta_time
 
         # Scroll the road
         road_x_position -= velocity * delta_time
@@ -81,6 +96,8 @@ def main():
         draw_font(f"Acceleration: {accelaration:.2f} m^2/s^2", screen, font, 10, 10)
         draw_font(f"Velocity: {velocity:.2f} m/s", screen, font, 10, 35)
         draw_font(f"Distance Traveled: {total_distance:.2f} m", screen, font, 10, 60)
+        draw_font(f"Target Distance: {target_distance}", screen, font, 10, 85)
+        draw_font(f"Elapsed Time: {elapsed_time:.2f}", screen, font, 10, 100)
 
         # Draw the van
         width, height = van_sprite.get_size()
